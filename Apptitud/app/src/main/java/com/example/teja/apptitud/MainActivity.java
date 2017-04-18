@@ -28,6 +28,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -37,7 +38,9 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements SensorEventListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+import static java.lang.Math.pow;
+
+public class MainActivity extends AppCompatActivity implements SensorEventListener,GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 private TextView textview;
     ListView listView;
     Button button;
@@ -73,6 +76,7 @@ private TextView textview;
         resume=(Button) findViewById(R.id.button2);
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
 
 
         button.setOnClickListener(new View.OnClickListener() {
@@ -110,7 +114,14 @@ private TextView textview;
     }
 
     @Override
-    public void onSensorChanged(SensorEvent sensorEvent) {
+    public void onSensorChanged(SensorEvent event) {
+        if (event.sensor.getType()==Sensor.TYPE_ACCELEROMETER){
+            float ax=event.values[0];
+            float ay=event.values[1];
+            float az=event.values[2];
+           double net= Math.sqrt(pow(ax,2) + pow(ay,2) + pow(az,2)) - 9.8;
+            Toast.makeText(getBaseContext(),"values net"+net, Toast.LENGTH_LONG).show();
+        }
 
     }
 
@@ -118,12 +129,11 @@ private TextView textview;
     public void onAccuracyChanged(Sensor sensor, int i) {
 
     }
-
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-      intent = new Intent( this, ActivityRecognisedService.class );
-        PendingIntent pendingIntent = PendingIntent.getService( this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT );
-        ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates( mApiClient, 800, pendingIntent );
+   //   intent = new Intent( this, ActivityRecognisedService.class );
+     //   PendingIntent pendingIntent = PendingIntent.getService( this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT );
+       // ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates( mApiClient, 800, pendingIntent );
     }
 
 
@@ -283,6 +293,7 @@ private ServiceConnection musicConnection = new ServiceConnection(){
             playIntent = new Intent(this, MusicService.class);
             bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
             startService(playIntent);
+
         }
 
     }
@@ -294,15 +305,16 @@ private ServiceConnection musicConnection = new ServiceConnection(){
      //   stopService(playIntent);
         Log.d("MAIN ACTIVITY","stopped Main Activity");
        // intent.setAction("stop");
-        stopService(intent);
+      //  stopService(intent);
 
+        sensorManager.unregisterListener(this);
     }
 
     protected void onDestroy(){
         super.onDestroy();
         Log.d("MAinActivirt","Destroyed");
       //  intent.setAction("stop");
-        stopService(intent);
+        //stopService(intent);
 
      //   stopService(playIntent);
 

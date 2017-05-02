@@ -12,6 +12,8 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.hardware.TriggerEvent;
+import android.hardware.TriggerEventListener;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
@@ -21,9 +23,17 @@ import android.provider.MediaStore;
 import android.app.Fragment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
@@ -40,14 +50,16 @@ import java.util.ArrayList;
 
 import static java.lang.Math.pow;
 
-public class MainActivity extends AppCompatActivity implements SensorEventListener,GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class MainActivity extends AppCompatActivity implements SensorEventListener,GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener , NavigationView.OnNavigationItemSelectedListener{
 private TextView textview;
     ListView listView;
     Button button;
     Button pause;
     Button resume;
+    FloatingActionButton fab;
       static MusicService musicSrv;
     static  Intent playIntent;
+    static float steps;
     Intent intent;
     private static boolean musicBound = false;
    static ArrayList<Songs> arrayList = new ArrayList<Songs>();
@@ -57,27 +69,88 @@ private TextView textview;
     boolean activityRunning;
     public GoogleApiClient mApiClient;
     static TextView tv;
+    TextView t;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        File f = null;
-        File[] paths;
-        textview = (TextView) findViewById(R.id.t1);
+        setContentView(R.layout.activity_main2);
+       Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+         fab = (FloatingActionButton) findViewById(R.id.fab);
+       fab.setImageResource(R.drawable.ic_media_play);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+               String tog= musicSrv.toggle();
+                if(tog.equalsIgnoreCase("paused"))
+                {
+                    fab.setImageResource(R.drawable.ic_media_play);
+                }
+                else
+                {
+                    fab.setImageResource(R.drawable.ic_media_pause);
+                }
+                Snackbar.make(view, tog, Snackbar.LENGTH_SHORT)
+                        .setAction("Action", null).show();
+            }
+        });
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
         SongList songlist =new SongList();
         songlist.execute("ds");
         listView =(ListView) findViewById(R.id.songlistview);
-        button=(Button) findViewById(R.id.button);
-        tv=(TextView) findViewById(R.id.t1);
+      //  button=(Button) findViewById(R.id.button);
+        //Button pd=(Button) findViewById(R.id.button4);
+
+        t=(TextView)findViewById(R.id.pedodisplay);
 
         pause=(Button) findViewById(R.id.button3);
         resume=(Button) findViewById(R.id.button2);
 
-        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
+        Fragment fragment= new BlankFragment();
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.replace(R.id.frame,fragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
 
+
+
+// sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+   //     sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER), SensorManager.SENSOR_DELAY_NORMAL);
+
+     //   sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+       // Sensor mSensor= sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
+        //sensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
+
+       // TriggerEventListener triggerEventListener = new TriggerEventListener() {
+         //   @Override
+           // public void onTrigger(TriggerEvent event) {
+                // Do work
+            //}
+        //};
+        //sensorManager.requestTriggerSensor(triggerEventListener, mSensor);
+     /*   pd.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v){
+                Fragment fragment= new PedoFragment();
+                FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                transaction.replace(R.id.activity_main,fragment);
+                transaction.addToBackStack(null);
+                transaction.commit();
+
+
+            }
+        });
 
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -85,45 +158,45 @@ private TextView textview;
               //  startActivity(in);
                 Fragment fragment= new ItemFragment();
                 FragmentTransaction transaction = getFragmentManager().beginTransaction();
-                transaction.replace(R.id.activity_main,fragment); // fragment container id in first parameter is the  container(Main layout id) of Activity
-                transaction.addToBackStack(null);  // this will manage backstack
+                transaction.replace(R.id.activity_main,fragment);
+                transaction.addToBackStack(null);
                 transaction.commit();
             }
         });
-        pause.setOnClickListener(new View.OnClickListener(){
+
+        */
+/*      pause.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
                 musicSrv.pause();
             }
 
         });
-        resume.setOnClickListener(new View.OnClickListener(){
+        */
+        /*resume.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
                 musicSrv.restart();
             }
 
         });
+*/
 
-
-        mApiClient = new GoogleApiClient.Builder(this)
+      mApiClient = new GoogleApiClient.Builder(this)
                 .addApi(ActivityRecognition.API)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .build();
 
-        mApiClient.connect();
+
+       mApiClient.connect();
+
     }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if (event.sensor.getType()==Sensor.TYPE_ACCELEROMETER){
-            float ax=event.values[0];
-            float ay=event.values[1];
-            float az=event.values[2];
-           double net= Math.sqrt(pow(ax,2) + pow(ay,2) + pow(az,2)) - 9.8;
-            Toast.makeText(getBaseContext(),"values net"+net, Toast.LENGTH_LONG).show();
+
         }
 
-    }
+
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
@@ -131,10 +204,12 @@ private TextView textview;
     }
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-   //   intent = new Intent( this, ActivityRecognisedService.class );
-     //   PendingIntent pendingIntent = PendingIntent.getService( this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT );
-       // ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates( mApiClient, 800, pendingIntent );
+      intent = new Intent( this, ActivityRecognisedService.class );
+       PendingIntent pendingIntent = PendingIntent.getService( this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT );
+        ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates( mApiClient, 0, pendingIntent );
+
     }
+
 
 
 
@@ -147,6 +222,44 @@ private TextView textview;
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
     }
+
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.pedometer) {
+            Fragment fragment= new PedoFragment();
+            FragmentTransaction transaction = getFragmentManager().beginTransaction();
+            transaction.replace(R.id.frame,fragment);
+            transaction.addToBackStack(null);
+            transaction.commit();
+
+
+            // Handle the camera action
+        } else if (id == R.id.music) {
+            Fragment fragment= new ItemFragment();
+            FragmentTransaction transaction = getFragmentManager().beginTransaction();
+            transaction.replace(R.id.frame,fragment);
+            transaction.addToBackStack(null);
+            transaction.commit();
+
+
+
+        } else if (id == R.id.home) {
+            Fragment fragment= new BlankFragment();
+            FragmentTransaction transaction = getFragmentManager().beginTransaction();
+            transaction.replace(R.id.frame,fragment);
+            transaction.addToBackStack(null);
+            transaction.commit();
+
+
+        }
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
 
     class SongList extends AsyncTask<String,Void,String> {
               String names=" ";
@@ -305,18 +418,17 @@ private ServiceConnection musicConnection = new ServiceConnection(){
      //   stopService(playIntent);
         Log.d("MAIN ACTIVITY","stopped Main Activity");
        // intent.setAction("stop");
-      //  stopService(intent);
+  //    stopService(intent);
 
-        sensorManager.unregisterListener(this);
+   //     sensorManager.unregisterListener(this);
     }
 
     protected void onDestroy(){
         super.onDestroy();
         Log.d("MAinActivirt","Destroyed");
       //  intent.setAction("stop");
-        //stopService(intent);
-
-     //   stopService(playIntent);
+    //    stopService(intent);
+       stopService(playIntent);
 
     }
 }

@@ -53,94 +53,111 @@ public class ActivityRecognisedService extends IntentService {
                 case DetectedActivity.IN_VEHICLE: {
                     Log.e( "ActivityRecogition", "In Vehicle: " + activity.getConfidence() );
                  //   MainActivity.settext("Vehicle");
-                    if( activity.getConfidence() >= 10 ) {
-                        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+                   if( activity.getConfidence() >= 10 ) {
+              /*          NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
                         builder.setContentText( "Are you in car?"+activity.getConfidence() );
                         builder.setSmallIcon( R.mipmap.ic_launcher );
                         builder.setContentTitle( getString( R.string.app_name ) );
-                        NotificationManagerCompat.from(this).notify(0, builder.build());
-                        MainActivity.musicSrv.restart();
+                        NotificationManagerCompat.from(this).notify(0, builder.build());*/
+
 
                     }
                     break;
                 }
                 case DetectedActivity.ON_BICYCLE: {
-                    Log.e( "ActivityRecogition", "On Bicycle: " + activity.getConfidence() );
-                 //   MainActivity.settext("Vehicle");
-                    NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-                    builder.setContentText( "Are you on bicycle?"+activity.getConfidence() );
-                    builder.setSmallIcon( R.mipmap.ic_launcher );
-                    builder.setContentTitle( getString( R.string.app_name ) );
-                    NotificationManagerCompat.from(this).notify(0, builder.build());
-                    MainActivity.musicSrv.restart();
+                    if(activity.getConfidence()>60) {
+                        Log.e("ActivityRecogition", "On Bicycle: " + activity.getConfidence());
+                        //   MainActivity.settext("Vehicle");
+                   /*     NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+                        builder.setContentText("Are you on bicycle?" + activity.getConfidence());
+                        builder.setSmallIcon(R.mipmap.ic_launcher);
+                        builder.setContentTitle(getString(R.string.app_name));
+                        NotificationManagerCompat.from(this).notify(0, builder.build());*/
+                        if(MainActivity.musicSrv!=null)
+                            MainActivity.musicSrv.restart();
+                    }
                     break;
                 }
                 case DetectedActivity.ON_FOOT: {
                     Log.e( "ActivityRecogition", "On Foot: " + activity.getConfidence() );
                   //  MainActivity.settext("Onfoot");
-                    NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+               /*     NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
                     builder.setContentText( "Are you onfoot?"+activity.getConfidence() );
                     builder.setSmallIcon( R.mipmap.ic_launcher );
                     builder.setContentTitle( getString( R.string.app_name ) );
                     NotificationManagerCompat.from(this).notify(0, builder.build());
-                    MainActivity.musicSrv.restart();
+                   // MainActivity.musicSrv.restart();
+                   */
                     break;
                 }
                 case DetectedActivity.RUNNING: {
                     Log.e( "ActivityRecogition", "Running: " + activity.getConfidence() );
                   //  MainActivity.settext("run");
-                    NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+                 /*   NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
                     builder.setContentText( "Are you running?"+activity.getConfidence() );
                     builder.setSmallIcon( R.mipmap.ic_launcher );
                     builder.setContentTitle( getString( R.string.app_name ) );
                     NotificationManagerCompat.from(this).notify(0, builder.build());
                     MainActivity.musicSrv.restart();
+                    */
+                    if(activity.getConfidence()>60)
+                    {
+                        if(MainActivity.musicSrv!=null)
+                            MainActivity.musicSrv.restart();
+                    }
                     break;
                 }
                 case DetectedActivity.STILL: {
                     Log.e( "ActivityRecogition", "Still: " + activity.getConfidence() );
                   //  MainActivity.settext("still");
-                    NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-                    builder.setContentText( "Are you still?"+activity.getConfidence() );
+                    if(MainActivity.musicSrv!=null && (activity.getConfidence()>20)) {
+                   NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+                    builder.setContentText( "get moving !"+activity.getConfidence() );
                     builder.setSmallIcon( R.mipmap.ic_launcher );
                     builder.setContentTitle( getString( R.string.app_name ) );
-                    NotificationManagerCompat.from(this).notify(0, builder.build());
-                    MainActivity.musicSrv.pause();
+
+                        NotificationManagerCompat.from(this).notify(0, builder.build());
+                        MainActivity.musicSrv.pause();
+                    }
+
                     break;
                 }
                 case DetectedActivity.TILTING: {
-                    Log.e( "ActivityRecogition", "Tilting: " + activity.getConfidence() );
-                  //  MainActivity.tv.setText("titlitng");
-                 //   if( activity.getConfidence() >= 30 ) {
-                        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-                        builder.setContentText( "Are you tilitng?"+activity.getConfidence() );
-                        builder.setSmallIcon( R.mipmap.ic_launcher );
-                        builder.setContentTitle( getString( R.string.app_name ) );
-                        NotificationManagerCompat.from(this).notify(0, builder.build());
-                //    }
-                    break;
+                    if (MainActivity.musicSrv!=null) {
+                        Log.e("ActivityRecogition", "Tilting: " + activity.getConfidence());
+                        //  MainActivity.tv.setText("titlitng");
+                        //   if( activity.getConfidence() >= 30 ) {
+
+                        //    }
+                        break;
+
+                    }
                 }
                 case DetectedActivity.WALKING: {
                     Log.e( "ActivityRecogition", "Walking: " + activity.getConfidence() );
                    // MainActivity.settext("Walking");
-                 //   if( activity.getConfidence() >= 30 ) {
-                        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+                    if( activity.getConfidence() >= 30 ) {
+                     /*   NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
                         builder.setContentText( "Are you walking?"+activity.getConfidence());
                         builder.setSmallIcon( R.mipmap.ic_launcher );
                         builder.setContentTitle( getString( R.string.app_name ) );
                         NotificationManagerCompat.from(this).notify(0, builder.build());
-                    MainActivity.musicSrv.restart();
-                 //   }
+                        */
+                        if(MainActivity.musicSrv!=null)
+                            MainActivity.musicSrv.restart();
+
+                    }
                     break;
                 }
                 case DetectedActivity.UNKNOWN: {
                     Log.e( "ActivityRecogition", "Unknown: " + activity.getConfidence() );
-                  //  MainActivity.settext("Unknown");
-                    NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-                    builder.setContentText( "unknown"+activity.getConfidence() );
-                    builder.setSmallIcon( R.mipmap.ic_launcher );
-                    builder.setContentTitle( getString( R.string.app_name ) );
-                    NotificationManagerCompat.from(this).notify(0, builder.build());
+                    if(MainActivity.musicSrv!=null) {//  MainActivity.settext("Unknown");
+                        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+                        builder.setContentText("unknown" + activity.getConfidence());
+                        builder.setSmallIcon(R.mipmap.ic_launcher);
+                        builder.setContentTitle(getString(R.string.app_name));
+                        NotificationManagerCompat.from(this).notify(0, builder.build());
+                    }
                     break;
                 }
             }

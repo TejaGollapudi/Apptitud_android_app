@@ -3,6 +3,7 @@ package com.example.teja.apptitud;
 import android.content.Context;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ListFragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -32,10 +33,9 @@ public class ItemFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        //This layout contains your list view
+
         View view = inflater.inflate(R.layout.content_song_view, container, false);
 
-        //now you must initialize your list view
         ListView listview =(ListView)view.findViewById(R.id.songlistview);
         Log.e("ss",listview.toString());
 
@@ -58,6 +58,8 @@ public class ItemFragment extends Fragment {
                 // startActivity(in);
                 MainActivity.musicSrv.setIndex(position);
                 MainActivity.musicSrv.playSong();
+                FloatingActionButton fab=(FloatingActionButton) getActivity().findViewById(R.id.fab);
+                fab.setImageResource(R.drawable.ic_media_pause);
                 //Toast.makeText(getBaseContext(), item, Toast.LENGTH_LONG).show();
 
             }

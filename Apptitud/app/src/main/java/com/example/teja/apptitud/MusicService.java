@@ -117,7 +117,22 @@ songs=MainActivity.getSongList();
             player.seekTo(length);
             player.start();
             i=0;
+
         }}
+    public String toggle() {
+        if (i == 1) {
+            player.seekTo(length);
+            player.start();
+            i = 0;
+            return "reusmed";
+        } else {
+            player.pause();
+            length=player.getCurrentPosition();
+            i=1;
+            return "paused";
+
+        }
+    }
 
     @Override
     public void onDestroy(){
